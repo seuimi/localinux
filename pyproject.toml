@@ -1,0 +1,19 @@
+[project]
+name = "localinux"
+version = "1.0.0"
+description = "Local Linux Simulator Made Python"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "pyyaml>=6.0.3",
+    "questionary>=2.1.1",
+    "rich>=15.0.0",
+    "ruamel-yaml>=0.19.1",
+]
+
+[project.scripts]
+localinux = "localinux:main"
+
+[build-system]
+requires = ["uv_build>=0.12.7,<0.13.0"]
+build-backend = "uv_build"
