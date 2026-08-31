@@ -1,9 +1,91 @@
-print(
-    "안녕하세요! Localinux 입니다. 실행하는데 문제가 생겨서 이게 실행된거 같아요..." + '\n'
-    "만약 해결할 수 있는 문제로 이 화면이 계속 뜬다면 공식 깃헙 레포의 설명을 다시 한번 자세히 읽어보고" + '\n'
-    "그래도 해결이 안되면, 이슈에 올려주세요! 빠르게 고치겠습니다!" + '\n' + '\n'
+import os
+import subprocess
+from pathlib import Path
 
-    "Hello! This is Localinux. It seems that a problem occurred while trying to run the program." + '\n'
-    "If this screen keeps appearing due to an issue that can be fixed, please read the instructions on the official GitHub repository carefully once again." + '\n'
-    "If you still can't solve the problem, please report it as an issue! We'll fix it as quickly as possible!" + '\n' + '\n'
-)
+from rich.console import Console
+from rich.text import Text
+from ruamel.yaml import YAML
+
+# 프로젝트 루트 (src/localinux → src → 루트)
+ROOT = Path(__file__).resolve().parents[2]
+CONFIG_FILE = ROOT / "config.yaml"
+LOCALES_DIR = ROOT / "locales"
+
+yaml = YAML()
+yaml.preserve_quotes = True
+
+
+def load_config() -> dict:
+    if not CONFIG_FILE.exists():
+        return {"first_setup": False, "language": "", "user_name": ""}
+
+    with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+        data = yaml.load(f)
+        return data or {"first_setup": False, "language": "", "user_name": ""}
+
+
+def load_language(language: str) -> dict:
+    path = LOCALES_DIR / f"{language}.yaml"
+
+    if not path.exists():
+        # fallback
+        path = LOCALES_DIR / "en.yaml"
+
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.load(f)
+
+
+def print_logo(console: Console) -> None:
+    localinux_logo = """\
+██╗      ██████╗  ██████╗ █████╗ ██╗     ██╗███╗   ██╗██╗   ██╗██╗  ██╗
+██║     ██╔═══██╗██╔════╝██╔══██╗██║     ██║████╗  ██║██║   ██║╚██╗██╔╝
+██║     ██║   ██║██║     ███████║██║     ██║██╔██╗ ██║██║   ██║ ╚███╔╝
+██║     ██║   ██║██║     ██╔══██║██║     ██║██║╚██╗██║██║   ██║ ██╔██╗
+███████╗╚██████╔╝╚██████╗██║  ██║███████╗██║██║ ╚████║╚██████╔╝██╔╝ ██╗
+╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝
+L O C A L I N U X
+"""
+
+    logo = Text()
+    for line in localinux_logo.splitlines():
+        for i, char in enumerate(line):
+            if char != " ":
+                ratio = i / max(len(line) - 1, 1)
+                r = 255
+                g = int(255 - (155 * ratio))
+                b = int(255 - (75 * ratio))
+                logo.append(char, style=f"rgb({r},{g},{b})")
+            else:
+                logo.append(" ")
+        logo.append("\n")
+
+    console.print(logo)
+
+
+def main() -> None:
+    console = Console()
+
+    config = load_config()
+    lang_code = config.get("language") or "ko"
+    t = load_language(lang_code)
+    splash = t.get("splash", {})
+
+    # 화면 지우기
+    subprocess.run(["cls" if os.name == "nt" else "clear"], shell=True)
+
+    print_logo(console)
+    console.print()
+    console.print(f"[bold cyan]Localinux[/bold cyan]  [dim]{splash.get('tagline', '')}[/dim]")
+    console.print()
+    console.print(f"[bold]{splash.get('made_by', 'Made by')}[/bold]  [green]{splash.get('author', '')}[/green]")
+    console.print(f"[dim]{splash.get('repo', '')}[/dim]")
+    console.print()
+    console.print(f"[yellow]{splash.get('how_to_run', '')}[/yellow]")
+    console.print(f"  [bold white]{splash.get('run_command', 'uv run main.py')}[/bold white]")
+    console.print()
+    console.print(f"[dim]{splash.get('hint', '')}[/dim]")
+    console.print()
+
+
+if __name__ == "__main__":
+    main()

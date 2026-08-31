@@ -6,6 +6,17 @@ import subprocess
 from ruamel.yaml import YAML
 from rich.console import Console
 from rich.text import Text
+import tarfile
+from pathlib import Path
+from urllib.request import urlopen
+from rich.progress import (
+    Progress,
+    BarColumn,
+    TextColumn,
+    DownloadColumn,
+    TransferSpeedColumn,
+    TimeRemainingColumn
+)
 
 
 
@@ -76,13 +87,15 @@ language = load_language(config["language"])
 console = Console()
 
 localinux_logo = """\
-██╗      ██████╗  ██████╗ █████╗ ██╗     ██╗███╗   ██╗██╗   ██╗██╗  ██╗
-██║     ██╔═══██╗██╔════╝██╔══██╗██║     ██║████╗  ██║██║   ██║╚██╗██╔╝
-██║     ██║   ██║██║     ███████║██║     ██║██╔██╗ ██║██║   ██║ ╚███╔╝
-██║     ██║   ██║██║     ██╔══██║██║     ██║██║╚██╗██║██║   ██║ ██╔██╗
-███████╗╚██████╔╝╚██████╗██║  ██║███████╗██║██║ ╚████║╚██████╔╝██╔╝ ██╗
-╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝
-L O C A L I N U X
+
+
+    ██╗      ██████╗  ██████╗ █████╗ ██╗     ██╗███╗   ██╗██╗   ██╗██╗  ██╗
+    ██║     ██╔═══██╗██╔════╝██╔══██╗██║     ██║████╗  ██║██║   ██║╚██╗██╔╝
+    ██║     ██║   ██║██║     ███████║██║     ██║██╔██╗ ██║██║   ██║ ╚███╔╝
+    ██║     ██║   ██║██║     ██╔══██║██║     ██║██║╚██╗██║██║   ██║ ██╔██╗
+    ███████╗╚██████╔╝╚██████╗██║  ██║███████╗██║██║ ╚████║╚██████╔╝██╔╝ ██╗
+    ╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝
+        L O C A L I N U X
 """
 
 logo = Text()
@@ -113,14 +126,12 @@ console.print(logo)
 # 초기세팅
 if config["first_setup"] is False:
         user_name_set = questionary.text(
-              language["setup"]["user_set"], validate=lambda text: bool(re.fullmatch(r"[A-Za-z0-9_]+", text))
+              language["setup"]["user_set"], validate=lambda text: bool(re.fullmatch(r"[A-Za-z0-9_-]+", text))
         ).ask()
 
         config["first_setup"] = True
         config["user_name"] = user_name_set
 
         save_config(config)
-
-        print(language["setup"]["user_set_complete"])
 else:
-      print("세팅이 이미 완료된 상태입니다.")
+      print("done.")

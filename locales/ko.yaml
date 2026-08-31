@@ -1,3 +1,11 @@
+splash:
+  tagline: "Local + Linux = ❤️"
+  made_by: "Made by"
+  author: "seuimi (Suyeong Jang)"
+  repo: "https://github.com/seuimi/localinux"
+  how_to_run: "실행 방법"
+  run_command: "uv run main.py"
+  hint: "프로그램을 시작하려면 위 명령어를 입력하세요."
+
 setup:
   user_set: "Localinux에 사용할 이름을 적어주세요! (영어, 숫자, -, _가 가능합니다.)"
-  user_set_complete: "!! 이름이 세팅되었습니다. 시스템을 설정합니다. !!"
