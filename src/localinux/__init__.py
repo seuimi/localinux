@@ -6,7 +6,6 @@ from rich.console import Console
 from rich.text import Text
 from ruamel.yaml import YAML
 
-# 프로젝트 루트 (src/localinux → src → 루트)
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG_FILE = ROOT / "config.yaml"
 LOCALES_DIR = ROOT / "locales"
@@ -28,7 +27,6 @@ def load_language(language: str) -> dict:
     path = LOCALES_DIR / f"{language}.yaml"
 
     if not path.exists():
-        # fallback
         path = LOCALES_DIR / "en.yaml"
 
     with open(path, "r", encoding="utf-8") as f:
@@ -37,13 +35,15 @@ def load_language(language: str) -> dict:
 
 def print_logo(console: Console) -> None:
     localinux_logo = """\
-██╗      ██████╗  ██████╗ █████╗ ██╗     ██╗███╗   ██╗██╗   ██╗██╗  ██╗
-██║     ██╔═══██╗██╔════╝██╔══██╗██║     ██║████╗  ██║██║   ██║╚██╗██╔╝
-██║     ██║   ██║██║     ███████║██║     ██║██╔██╗ ██║██║   ██║ ╚███╔╝
-██║     ██║   ██║██║     ██╔══██║██║     ██║██║╚██╗██║██║   ██║ ██╔██╗
-███████╗╚██████╔╝╚██████╗██║  ██║███████╗██║██║ ╚████║╚██████╔╝██╔╝ ██╗
-╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝
-L O C A L I N U X
+    
+    
+    ██╗      ██████╗  ██████╗ █████╗ ██╗     ██╗███╗   ██╗██╗   ██╗██╗  ██╗
+    ██║     ██╔═══██╗██╔════╝██╔══██╗██║     ██║████╗  ██║██║   ██║╚██╗██╔╝
+    ██║     ██║   ██║██║     ███████║██║     ██║██╔██╗ ██║██║   ██║ ╚███╔╝
+    ██║     ██║   ██║██║     ██╔══██║██║     ██║██║╚██╗██║██║   ██║ ██╔██╗
+    ███████╗╚██████╔╝╚██████╗██║  ██║███████╗██║██║ ╚████║╚██████╔╝██╔╝ ██╗
+    ╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝
+        L O C A L I N U X
 """
 
     logo = Text()
@@ -70,7 +70,6 @@ def main() -> None:
     t = load_language(lang_code)
     splash = t.get("splash", {})
 
-    # 화면 지우기
     subprocess.run(["cls" if os.name == "nt" else "clear"], shell=True)
 
     print_logo(console)
