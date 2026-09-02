@@ -9,3 +9,11 @@ splash:
 
 setup:
   user_set: "Localinux에 사용할 이름을 적어주세요! (영어, 숫자, -, _가 가능합니다.)"
+  user_set_done: "!! Localinux에 사용할 이름을 설정했습니다 !!"
+
+server:
+  download_start: "!! 서버를 다운로드 중... !!"
+  download_error: "!! 다운로드에 문제가 생겼습니다 !!"
+  download_done: "!! 서버 다운로드 완료 !!"
+  zip_out_your_pc: "!! 다운로드한 서버 압축 해제 중... !!"
+  zip_out_your_pc_done: "!! 다운로드한 서버 압축 해제 완료 !!"

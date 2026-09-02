@@ -6,9 +6,10 @@ import subprocess
 from ruamel.yaml import YAML
 from rich.console import Console
 from rich.text import Text
-import tarfile
+import zipfile
 from pathlib import Path
 from urllib.request import urlopen
+from urllib.error import URLError
 from rich.progress import (
     Progress,
     BarColumn,
@@ -66,9 +67,7 @@ config = load_config()
 
 # 언어 설정
 if config["language"] == "":
-    language_set = questionary.select(
-        "언어를 선택하세요.", choices=["한국어", "English"]
-    ).ask()
+    language_set = questionary.select("언어를 선택하세요.", choices=["한국어", "English"]).ask()
 
     language_list = {
         "한국어": "ko",
@@ -123,14 +122,80 @@ console.print(logo)
 
 
 
+# 서버 다운로드
+server_download_url = "http://127.0.0.1:1234/server-latest.zip"
+
+server_DIR = Path("server")
+server_PATH = server_DIR / "server-latest.zip"
+
+def download_server():
+    server_DIR.mkdir(parents=True, exist_ok=True)
+    console.print('\n' + language["server"]["download_start"], style="#FF9F43")
+
+    try:
+        with urlopen(server_download_url) as response:
+            total_size = int(response.headers.get("Content-Length", 0))
+            with open(server_PATH, "wb") as file:
+                with Progress(
+                    TextColumn("[progress.description]{task.description}"), BarColumn(), DownloadColumn(), TransferSpeedColumn(), TimeRemainingColumn()
+                ) as progress:
+                    task = progress.add_task(
+                        "server download...", total=total_size
+                    )
+                    while True:
+                        chunk = response.read(1024 * 64)
+                        if not chunk:
+                            break
+                        file.write(chunk)
+                        progress.update(
+                            task, advance=len(chunk)
+                        )
+
+        console.print(language["server"]["download_done"] + '\n', style="green")
+
+    except (URLError, TimeoutError, ConnectionError):
+        console.print('\n' + language["server"]["download_error"] + '\n', style="red")
+        input("[ Enter ] Program exit...")
+         
+        raise SystemExit
+
+
+
+# 서버 압축 해제
+def extract_server():
+    console.print(language["server"]["zip_out_your_pc"], style="#FF9F43")
+    with zipfile.ZipFile(server_PATH, "r") as archive:
+        members = archive.infolist()
+        with Progress(
+        TextColumn("[progress.description]{task.description}"), BarColumn(), TextColumn("{task.completed}/{task.total}"), TimeRemainingColumn(),
+        ) as progress:
+            task = progress.add_task(
+                "Extracting downloaded server...", total=len(members)
+            )
+            for member in members:
+                archive.extract(
+                    member, path=server_DIR
+                )
+                progress.update(
+                    task, advance=1
+                )
+    server_PATH.unlink()
+
+    console.print(language["server"]["zip_out_your_pc_done"] + '\n', style="green")
+
+
+
 # 초기세팅
 if config["first_setup"] is False:
-        user_name_set = questionary.text(
-              language["setup"]["user_set"], validate=lambda text: bool(re.fullmatch(r"[A-Za-z0-9_-]+", text))
-        ).ask()
+        user_name_set = questionary.text(language["setup"]["user_set"], validate=lambda text: bool(re.fullmatch(r"[A-Za-z0-9_-]+", text))).ask()
 
         config["first_setup"] = True
         config["user_name"] = user_name_set
+
+        console.print(language["setup"]["user_set_done"], style="green")
+
+        download_server()
+        extract_server()
 
         save_config(config)
 else:
