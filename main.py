@@ -187,16 +187,13 @@ def extract_server():
 
 # 초기세팅
 if config["first_setup"] is False:
-        user_name_set = questionary.text(language["setup"]["user_set"], validate=lambda text: bool(re.fullmatch(r"[A-Za-z0-9_-]+", text))).ask()
+    config["first_setup"] = True
 
-        config["first_setup"] = True
-        config["user_name"] = user_name_set
+    console.print(language["setup"]["user_set_done"], style="green")
 
-        console.print(language["setup"]["user_set_done"], style="green")
+    download_server()
+    extract_server()
 
-        download_server()
-        extract_server()
-
-        save_config(config)
+    save_config(config)
 else:
       print("done.")

@@ -7,10 +7,6 @@ splash:
   run_command: "uv run main.py"
   hint: "프로그램을 시작하려면 위 명령어를 입력하세요."
 
-setup:
-  user_set: "Localinux에 사용할 이름을 적어주세요! (영어, 숫자, -, _가 가능합니다.)"
-  user_set_done: "!! Localinux에 사용할 이름을 설정했습니다 !!"
-
 server:
   download_start: "!! 서버를 다운로드 중... !!"
   download_error: "!! 다운로드에 문제가 생겼습니다 !!"
